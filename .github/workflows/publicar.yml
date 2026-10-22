@@ -1,0 +1,41 @@
+name: publicar-prototipo
+on:
+  push:
+    paths:
+      - '.github/workflows/publicar.yml'
+permissions:
+  contents: write
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Baixar a pagina cifrada e conferir o SHA-256
+        env:
+          URLD: "https://ucc9512424e404a27605f3f155da.dl.dropboxusercontent.com/cd/0/get/DKdrXM56AeaYhLaQkdfUMrGxxuOS8XRlTkmpBvI8c42bjUblSxV45D6f_oGihTd-f0TVoR8a114hF3WBvvztpmNQUuoyZq5wJv3TckkQTK4Er3wlsSM8ZJFq0uJKmrgMA7w6b75z-pFSTXbNOkJiLPamjUKz0vuXqMdFR0AaeBQHag/file?c_luid=ab2cf6c8"
+          SHA: "fc92b2bca78a39e777d10b909235ab46479363e672e294dbfe7788e511d09b59"
+        run: |
+          curl -fsSL "$URLD" -o index.html
+          echo "$SHA  index.html" | sha256sum -c -
+      - name: Atualizar o README
+        run: |
+          cat > README.md <<'FIM'
+          # Focus Executive 2.0 · protótipo navegável
+
+          Protótipo da versão 2.0 do Focus Executive, que liga o OPS, a análise crítica e a superação.
+
+          O conteúdo é restrito. A página publicada traz apenas dados cifrados (AES-GCM, com chave derivada da senha por PBKDF2) e só abre com a senha de acesso. Nada é gravado: ao recarregar a página, a demonstração volta ao início.
+
+          ## Endereço
+
+          https://ginoterentimjr.github.io/focus-executive-v2-prototipo/
+
+          O site não é indexado por buscadores (`robots.txt` e `noindex`).
+          FIM
+      - name: Registrar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add index.html README.md
+          git commit -m "Protótipo do Focus 2.0 com conteúdo restrito por senha"
+          git push
