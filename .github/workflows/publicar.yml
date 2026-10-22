@@ -12,10 +12,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Baixar a pagina cifrada e conferir o SHA-256
         env:
-          URLD: "https://ucc9512424e404a27605f3f155da.dl.dropboxusercontent.com/cd/0/get/DKdrXM56AeaYhLaQkdfUMrGxxuOS8XRlTkmpBvI8c42bjUblSxV45D6f_oGihTd-f0TVoR8a114hF3WBvvztpmNQUuoyZq5wJv3TckkQTK4Er3wlsSM8ZJFq0uJKmrgMA7w6b75z-pFSTXbNOkJiLPamjUKz0vuXqMdFR0AaeBQHag/file?c_luid=ab2cf6c8"
+          URLD: "https://uc21f191a49cf5d2d953bbfa19d8.dl.dropboxusercontent.com/cd/0/get/DKf9_HsVttwhrneO17aAAj-CjkIzqBdA-6SFgBjMS6EV0QvjZLmh1zwFdEEwcnJ4ZmrJbJu49RuWA705OeQOy7gQpQXzw3ti0231EHaxhw3Ras8UsrEwp3ee-WYbDfQijoSEQxuvK_JlI-BiDeQYXoAnkWzkVdHosxUo-izplOTNPw/file?c_luid=ab2cf6c8"
           SHA: "fc92b2bca78a39e777d10b909235ab46479363e672e294dbfe7788e511d09b59"
         run: |
-          curl -fsSL "$URLD" -o index.html
+          code=$(curl -sS -A "Mozilla/5.0" -o index.html -w "%{http_code}" "$URLD" || true)
+          echo "HTTP $code, $(wc -c < index.html) bytes"
+          if [ "$code" != "200" ]; then head -c 400 index.html; exit 1; fi
           echo "$SHA  index.html" | sha256sum -c -
       - name: Atualizar o README
         run: |
